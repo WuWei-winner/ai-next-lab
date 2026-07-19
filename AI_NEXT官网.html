@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI NEXT 创业实验室——用 AI 创造真实商业价值。">
+  <meta name="theme-color" content="#071a45">
+  <title>AI NEXT｜创造未来</title>
+  <style>
+    :root {
+      --navy: #071a45;
+      --navy-2: #0d2b62;
+      --blue: #2878ff;
+      --purple: #7745f8;
+      --cyan: #58d8ff;
+      --ink: #0b2148;
+      --text: #475569;
+      --muted: #718096;
+      --surface: #f6f8fc;
+      --white: #ffffff;
+      --border: rgba(19, 61, 125, 0.1);
+      --shadow: 0 22px 60px rgba(20, 56, 120, 0.12);
+      --radius: 24px;
+      --container: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    body {
+      margin: 0;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.modal-open { overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    .container { width: min(calc(100% - 40px), var(--container)); margin-inline: auto; }
+    .section { padding: 108px 0; }
+    .section-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px;
+      color: #4e53da;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .section-kicker::before { content: ""; width: 24px; height: 2px; background: linear-gradient(90deg, var(--blue), var(--purple)); }
+    .section-title { margin: 0; font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.2; letter-spacing: -0.045em; }
+    .section-lead { max-width: 670px; margin: 18px 0 0; color: var(--text); font-size: 1.03rem; }
+
+    /* 顶部导航 */
+    .navbar {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 1000;
+      height: 76px;
+      background: rgba(5, 22, 61, 0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: height 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    }
+    .navbar.scrolled { height: 70px; background: rgba(5, 22, 61, 0.9); box-shadow: 0 12px 35px rgba(2, 11, 34, 0.24); }
+    .nav-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: white; font-weight: 850; letter-spacing: 0.08em; }
+    .brand img { width: 44px; height: 44px; object-fit: contain; border-radius: 11px; }
+    .brand span { font-size: 1.08rem; }
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-links a { position: relative; color: rgba(255,255,255,0.82); font-size: 0.94rem; font-weight: 600; transition: color .25s ease; }
+    .nav-links a::after { content: ""; position: absolute; left: 50%; right: 50%; bottom: -8px; height: 2px; background: linear-gradient(90deg, var(--cyan), #aa8cff); transition: left .25s ease, right .25s ease; }
+    .nav-links a:hover, .nav-links a:focus-visible { color: white; }
+    .nav-links a:hover::after, .nav-links a:focus-visible::after { left: 0; right: 0; }
+    .menu-toggle { display: none; width: 44px; height: 44px; padding: 10px; color: white; background: transparent; border: 0; cursor: pointer; }
+    .menu-toggle span { display: block; width: 24px; height: 2px; margin: 5px 0; border-radius: 3px; background: currentColor; transition: transform .25s ease, opacity .25s ease; }
+    .menu-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* 主横幅 */
+    .hero {
+      position: relative;
+      min-height: 760px;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, #061838 0%, #0b347a 46%, #5f37c9 100%);
+    }
+    .hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; }
+    .hero::before { width: 570px; height: 570px; right: -160px; top: 40px; background: radial-gradient(circle, rgba(96, 220, 255, .22), transparent 68%); }
+    .hero::after { width: 480px; height: 480px; left: -180px; bottom: -190px; background: radial-gradient(circle, rgba(157, 112, 255, .26), transparent 68%); }
+    .hero-grid {
+      position: absolute; inset: 0; opacity: .13;
+      background-image: linear-gradient(rgba(255,255,255,.25) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, transparent, black 35%, transparent 90%);
+    }
+    .hero-orbit { position: absolute; right: 7%; top: 23%; width: 330px; aspect-ratio: 1; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; animation: spin 24s linear infinite; }
+    .hero-orbit::before { content: ""; position: absolute; left: 13%; top: 5%; width: 12px; height: 12px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 24px var(--cyan); }
+    .hero-content { position: relative; z-index: 2; max-width: 900px; padding: 150px 0 100px; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 22px; padding: 8px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; color: rgba(255,255,255,.9); background: rgba(255,255,255,.08); font-size: .78rem; font-weight: 700; letter-spacing: .13em; }
+    .hero-tag i { width: 7px; height: 7px; border-radius: 50%; background: #77e7ff; box-shadow: 0 0 13px #77e7ff; }
+    .hero h1 { max-width: 860px; margin: 0; font-size: clamp(3rem, 7.3vw, 6.3rem); line-height: 1.04; letter-spacing: -.065em; text-wrap: balance; }
+    .hero h1 span { color: #91e7ff; text-shadow: 0 0 36px rgba(92, 216, 255, .24); }
+    .hero-subtitle { max-width: 660px; margin: 28px 0 38px; color: rgba(255,255,255,.72); font-size: clamp(1.05rem, 2vw, 1.3rem); letter-spacing: .03em; }
+    .gradient-btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 54px; padding: 0 26px; color: white; border: 0; border-radius: 14px; background: linear-gradient(105deg, #267fff, #7647f7); box-shadow: 0 12px 30px rgba(69, 93, 255, .38), 0 0 28px rgba(116, 93, 255, .18); font-weight: 750; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease; }
+    .gradient-btn:hover { transform: translateY(-3px); box-shadow: 0 18px 38px rgba(69, 93, 255, .48), 0 0 35px rgba(116, 93, 255, .25); }
+    .gradient-btn span { font-size: 1.25rem; transition: transform .25s ease; }
+    .gradient-btn:hover span { transform: translateX(4px); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 关于 */
+    .about { background: linear-gradient(180deg, white 0%, #f8faff 100%); }
+    .about-layout { display: grid; grid-template-columns: .82fr 1.4fr; gap: 82px; align-items: start; }
+    .about-heading { position: sticky; top: 120px; }
+    .about-stat { display: flex; align-items: baseline; gap: 10px; margin-top: 36px; }
+    .about-stat strong { font-size: 3.6rem; line-height: 1; letter-spacing: -.06em; background: linear-gradient(110deg, var(--blue), var(--purple)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .about-stat span { color: var(--muted); font-weight: 650; }
+    .about-copy { display: grid; gap: 18px; }
+    .info-block { padding: 28px 30px; background: rgba(255,255,255,.9); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 12px 40px rgba(31,70,130,.055); }
+    .info-block p { margin: 0; color: var(--text); text-align: justify; }
+    .info-block strong { color: var(--ink); }
+
+    /* 项目 */
+    .projects { background: var(--surface); }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 36px; margin-bottom: 46px; }
+    .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .project-card { overflow: hidden; background: white; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 34px rgba(25,63,125,.07); transition: transform .35s ease, box-shadow .35s ease; }
+    .project-card:hover { transform: translateY(-10px); box-shadow: var(--shadow); }
+    .project-visual { position: relative; aspect-ratio: 16 / 10; display: grid; place-items: center; overflow: hidden; color: white; }
+    .project-visual::before, .project-visual::after { content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.26); }
+    .project-visual::before { width: 210px; height: 210px; right: -65px; top: -75px; }
+    .project-visual::after { width: 130px; height: 130px; left: -40px; bottom: -52px; }
+    .visual-one { background: linear-gradient(135deg, #0a3c91, #6654e9); }
+    .visual-two { background: linear-gradient(135deg, #132b6d, #4d82f1 55%, #8e52ec); }
+    .visual-three { background: linear-gradient(135deg, #132655, #7549dc 60%, #e35db5); }
+    .visual-mark { position: relative; z-index: 1; display: grid; place-items: center; width: 86px; height: 86px; border: 1px solid rgba(255,255,255,.32); border-radius: 24px; background: rgba(255,255,255,.12); box-shadow: inset 0 1px 1px rgba(255,255,255,.25), 0 18px 45px rgba(0,0,0,.16); backdrop-filter: blur(8px); font-size: 1.5rem; font-weight: 900; letter-spacing: -.03em; }
+    .project-body { padding: 27px 28px 30px; }
+    .project-label { margin-bottom: 10px; color: #5d61df; font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .project-card h3 { margin: 0 0 10px; font-size: 1.35rem; letter-spacing: -.025em; }
+    .project-card p { min-height: 84px; margin: 0 0 22px; color: var(--text); font-size: .94rem; }
+    .learn-more { display: inline-flex; align-items: center; gap: 8px; padding: 0; color: #315fca; background: none; border: 0; font-weight: 750; cursor: pointer; }
+    .learn-more::after { content: "→"; transition: transform .2s ease; }
+    .learn-more:hover::after { transform: translateX(5px); }
+
+    /* 每日创造 */
+    .daily { position: relative; overflow: hidden; background: white; }
+    .daily-card { position: relative; overflow: hidden; padding: clamp(38px, 7vw, 72px); color: white; border-radius: 32px; background: linear-gradient(135deg, #081c49, #183f91 55%, #6841cf); box-shadow: 0 28px 70px rgba(25,56,130,.2); }
+    .daily-card::after { content: ""; position: absolute; width: 430px; height: 430px; right: -160px; top: -210px; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; box-shadow: 0 0 0 55px rgba(255,255,255,.025), 0 0 0 110px rgba(255,255,255,.025); }
+    .daily-date { position: relative; z-index: 1; margin-bottom: 20px; color: #8fe5ff; font-size: .93rem; font-weight: 750; letter-spacing: .08em; }
+    .daily-quote { position: relative; z-index: 1; max-width: 850px; margin: 0; font-size: clamp(1.7rem, 4vw, 3.25rem); line-height: 1.35; letter-spacing: -.035em; font-weight: 800; text-wrap: balance; }
+    .daily-note { position: relative; z-index: 1; margin: 22px 0 0; color: rgba(255,255,255,.61); font-size: .9rem; }
+
+    /* 页脚 */
+    footer { padding: 34px 0; color: rgba(255,255,255,.58); background: #061634; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+    .footer-copy { font-size: .88rem; }
+    .socials { display: flex; gap: 10px; }
+    .socials a { display: grid; place-items: center; width: 38px; height: 38px; color: rgba(255,255,255,.74); border: 1px solid rgba(255,255,255,.14); border-radius: 50%; font-size: .73rem; font-weight: 800; transition: color .2s ease, background .2s ease, transform .2s ease; }
+    .socials a:hover { color: white; background: rgba(255,255,255,.1); transform: translateY(-2px); }
+
+    /* 滚动显现 */
+    .reveal { opacity: 0; transform: translateY(34px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.65,.25,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .project-card:nth-child(2) { transition-delay: .1s; }
+    .project-card:nth-child(3) { transition-delay: .2s; }
+
+    /* 模态框 */
+    .modal { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 20px; visibility: hidden; opacity: 0; transition: opacity .25s ease, visibility .25s ease; }
+    .modal.open { visibility: visible; opacity: 1; }
+    .modal-backdrop { position: absolute; inset: 0; background: rgba(3,13,36,.72); backdrop-filter: blur(7px); }
+    .modal-dialog { position: relative; width: min(100%, 600px); max-height: min(80vh, 720px); overflow-y: auto; padding: 38px; background: white; border-radius: 24px; box-shadow: 0 30px 90px rgba(0,0,0,.28); transform: translateY(20px) scale(.98); transition: transform .28s ease; }
+    .modal.open .modal-dialog { transform: translateY(0) scale(1); }
+    .modal-close { position: absolute; top: 17px; right: 17px; display: grid; place-items: center; width: 38px; height: 38px; color: var(--ink); background: #f0f3f9; border: 0; border-radius: 50%; font-size: 1.35rem; cursor: pointer; }
+    .modal-tag { color: #5d61df; font-size: .75rem; font-weight: 800; letter-spacing: .13em; }
+    .modal h3 { margin: 8px 42px 14px 0; font-size: 1.75rem; line-height: 1.25; }
+    .modal p { margin: 0; color: var(--text); }
+
+    :focus-visible { outline: 3px solid #73d8ff; outline-offset: 4px; }
+
+    @media (max-width: 900px) {
+      .about-layout { grid-template-columns: 1fr; gap: 42px; }
+      .about-heading { position: static; }
+      .project-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-orbit { right: -100px; opacity: .55; }
+    }
+    @media (max-width: 700px) {
+      .container { width: min(calc(100% - 32px), var(--container)); }
+      .section { padding: 78px 0; }
+      .navbar, .navbar.scrolled { height: 66px; }
+      .brand img { width: 39px; height: 39px; }
+      .menu-toggle { display: block; }
+      .nav-links { position: absolute; top: 66px; left: 16px; right: 16px; display: grid; gap: 0; padding: 10px; visibility: hidden; opacity: 0; transform: translateY(-10px); background: rgba(5,22,61,.97); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; box-shadow: 0 18px 45px rgba(0,0,0,.25); transition: opacity .25s ease, transform .25s ease, visibility .25s ease; }
+      .nav-links.open { visibility: visible; opacity: 1; transform: translateY(0); }
+      .nav-links a { padding: 12px 14px; }
+      .nav-links a::after { display: none; }
+      .hero { min-height: 700px; }
+      .hero-content { padding: 126px 0 86px; }
+      .hero h1 { font-size: clamp(2.85rem, 14vw, 4.2rem); }
+      .hero-subtitle { margin: 24px 0 32px; }
+      .section-head { display: block; margin-bottom: 34px; }
+      .project-grid { grid-template-columns: 1fr; }
+      .project-card p { min-height: 0; }
+      .project-card:nth-child(2), .project-card:nth-child(3) { transition-delay: 0s; }
+      .about-stat strong { font-size: 3rem; }
+      .info-block { padding: 23px 22px; }
+      .daily-card { border-radius: 24px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .modal-dialog { padding: 32px 24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="#home" aria-label="AI NEXT 首页">
+        <!-- 可替换为实际 logo 图片 -->
+        <img src="logo2.png" alt="AI NEXT Logo">
+        <span>AI NEXT</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-links" id="navLinks" aria-label="主导航">
+        <a href="#home">首页</a>
+        <a href="#projects">项目</a>
+        <a href="#daily">每日创造</a>
+        <a href="#about">关于我们</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-orbit" aria-hidden="true"></div>
+      <div class="container hero-content">
+        <div class="hero-tag"><i></i>AI-DRIVEN INNOVATION LAB</div>
+        <h1>不讨论未来，<br><span>我们创造未来！</span></h1>
+        <p class="hero-subtitle">致力于用AI创造真实商业价值的长期创新组织</p>
+        <button class="gradient-btn" id="exploreBtn" type="button">探索项目 <span>→</span></button>
+      </div>
+    </section>
+
+    <section class="section about" id="about">
+      <div class="container about-layout">
+        <div class="about-heading reveal">
+          <span class="section-kicker">About AI NEXT</span>
+          <h2 class="section-title">从真实问题出发，<br>让创意接受检验。</h2>
+          <div class="about-stat"><strong>2026</strong><span>启程 · 持续创造</span></div>
+        </div>
+        <div class="about-copy">
+          <article class="info-block reveal">
+            <p><strong>AI_NEXT创业实验室成立于2026年7月13日</strong>，隶属于数学与统计学院，面向本科生开展人工智能应用、工程实践与创新创业训练。实验室以发现真实问题、开发最小可行产品并接受用户检验为基本路径，推动成员由人工智能工具学习者转变为能够参与项目协作、解决实际问题的实践型成员。</p>
+          </article>
+          <article class="info-block reveal">
+            <p>实验室聚焦<strong>大模型应用开发、数据驱动的产品验证与竞赛创新</strong>。成员运用ChatGPT、Claude、Gemini、Cursor、Codex等工具开展信息检索、内容生产、产品设计和辅助开发，依托GitHub进行项目协作，使用Vercel、Supabase等平台完成部署与数据服务。当前主项目为“AI辅导员生态”，包括辅导员考试刷题小程序、辅导员考试自媒体和AI辅导员工具；副项目为“AI NEXT自媒体矩阵”。</p>
+          </article>
+          <article class="info-block reveal">
+            <p>实验室将持续完善“AI辅导员生态”和自媒体矩阵，推动产品由需求分析走向上线运营与迭代验证。集训期间计划完成实验室品牌、官网和知识库建设，推动主项目MVP上线，开展种子用户招募、内容矩阵运营和收费测试，形成成员个人作品集与团队路演成果，逐步建立稳定的项目管理、人才培养和团队梯队机制。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section projects" id="projects">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="section-kicker">Selected Projects</span>
+            <h2 class="section-title">我们的项目</h2>
+          </div>
+          <p class="section-lead">把AI能力放进真实场景，用产品、内容和用户反馈建立持续进化的创新闭环。</p>
+        </div>
+        <div class="project-grid">
+          <article class="project-card reveal">
+            <div class="project-visual visual-one" role="img" aria-label="AI辅导员生态项目占位图"><div class="visual-mark">AI⁺</div></div>
+            <div class="project-body">
+              <div class="project-label">Main Project</div>
+              <h3>AI辅导员生态</h3>
+              <p>连接考试刷题、专业内容与智能工具，为辅导员学习和工作场景提供一体化AI支持。</p>
+              <button class="learn-more" type="button" data-project="counselor">了解更多</button>
+            </div>
+          </article>
+          <article class="project-card reveal">
+            <div class="project-visual visual-two" role="img" aria-label="AI内容工厂项目占位图"><div class="visual-mark">AIC</div></div>
+            <div class="project-body">
+              <div class="project-label">Creative Engine</div>
+              <h3>AI内容工厂</h3>
+              <p>以AI辅助选题、创作与分发，探索高质量内容的标准化生产流程和商业化验证。</p>
+              <button class="learn-more" type="button" data-project="content">了解更多</button>
+            </div>
+          </article>
+          <article class="project-card reveal">
+            <div class="project-visual visual-three" role="img" aria-label="AI NEXT自媒体矩阵项目占位图"><div class="visual-mark">NEXT</div></div>
+            <div class="project-body">
+              <div class="project-label">Media Matrix</div>
+              <h3>AI NEXT自媒体矩阵</h3>
+              <p>围绕AI实践、项目复盘与青年创新，打造跨平台内容矩阵和实验室品牌影响力。</p>
+              <button class="learn-more" type="button" data-project="media">了解更多</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section daily" id="daily">
+      <div class="container">
+        <div class="daily-card reveal">
+          <div class="daily-date" id="currentDate">正在读取今日日期…</div>
+          <p class="daily-quote" id="dailyQuote">今天，也让一个想法向现实更近一步。</p>
+          <p class="daily-note">DAILY CREATION · 每一天，都留下创造的证据</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-copy">© <span id="year"></span> AI NEXT 创业实验室. 保留所有权利。</div>
+      <div class="socials" aria-label="社交媒体">
+        <a href="#" aria-label="微信公众号占位">微</a>
+        <a href="#" aria-label="哔哩哔哩占位">B</a>
+        <a href="#" aria-label="GitHub占位">GH</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDescription">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog" tabindex="-1">
+      <button class="modal-close" type="button" aria-label="关闭项目详情" data-close-modal>×</button>
+      <div class="modal-tag">PROJECT DETAIL</div>
+      <h3 id="modalTitle"></h3>
+      <p id="modalDescription"></p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const navbar = document.getElementById('navbar');
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = document.getElementById('navLinks');
+      const modal = document.getElementById('projectModal');
+      const modalDialog = modal.querySelector('.modal-dialog');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalDescription = document.getElementById('modalDescription');
+      let lastFocusedElement = null;
+
+      const projectDetails = {
+        counselor: {
+          title: 'AI辅导员生态',
+          description: '这是实验室当前的核心项目，由辅导员考试刷题小程序、辅导员考试自媒体和AI辅导员工具共同组成。项目从备考与日常工作中的高频需求出发，通过内容服务建立用户连接，以智能工具提高学习和工作效率，并在真实用户反馈中持续验证产品价值。'
+        },
+        content: {
+          title: 'AI内容工厂',
+          description: '项目将选题研究、素材整理、内容生成、视觉设计、质量审核与多平台分发串联成可复用工作流。团队借助大模型提升创作效率，同时强调人工判断、事实核验与内容差异化，逐步探索稳定、优质且能够接受市场验证的内容生产方式。'
+        },
+        media: {
+          title: 'AI NEXT自媒体矩阵',
+          description: '围绕实验室实践过程、AI工具方法、项目复盘和青年创新故事，在不同内容平台建立协同传播矩阵。它既是品牌对外沟通窗口，也是成员训练选题、表达、运营和数据分析能力的真实项目场，为实验室持续积累内容资产与种子用户。'
+        }
+      };
+
+      const closeMenu = () => {
+        navLinks.classList.remove('open');
+        menuToggle.classList.remove('active');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.setAttribute('aria-label', '打开导航菜单');
+      };
+
+      menuToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        menuToggle.classList.toggle('active', isOpen);
+        menuToggle.setAttribute('aria-expanded', String(isOpen));
+        menuToggle.setAttribute('aria-label', isOpen ? '关闭导航菜单' : '打开导航菜单');
+      });
+
+      navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+      window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 50), { passive: true });
+      document.getElementById('exploreBtn').addEventListener('click', () => document.getElementById('projects').scrollIntoView({ behavior: 'smooth' }));
+
+      const quotes = [
+        '把一个模糊的想法，变成可以被看见的原型。',
+        '真正的创新，始于对真实问题的持续追问。',
+        '先创造，再验证；让用户告诉我们答案。',
+        '工具放大效率，思考决定创造的方向。',
+        '每一次小步迭代，都在缩短想法与价值的距离。',
+        '作品不是终点，而是下一轮反馈的起点。',
+        '保持好奇，持续行动，未来会在手中发生。'
+      ];
+      const now = new Date();
+      const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+      document.getElementById('currentDate').textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${weekdays[now.getDay()]}`;
+      document.getElementById('dailyQuote').textContent = quotes[now.getDay()];
+      document.getElementById('year').textContent = now.getFullYear();
+
+      const revealElements = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.13, rootMargin: '0px 0px -35px' });
+        revealElements.forEach(el => observer.observe(el));
+      } else {
+        revealElements.forEach(el => el.classList.add('visible'));
+      }
+
+      const openModal = projectKey => {
+        const detail = projectDetails[projectKey];
+        if (!detail) return;
+        lastFocusedElement = document.activeElement;
+        modalTitle.textContent = detail.title;
+        modalDescription.textContent = detail.description;
+        modal.classList.add('open');
+        document.body.classList.add('modal-open');
+        requestAnimationFrame(() => modalDialog.focus());
+      };
+
+      const closeModal = () => {
+        modal.classList.remove('open');
+        document.body.classList.remove('modal-open');
+        if (lastFocusedElement) lastFocusedElement.focus();
+      };
+
+      document.querySelectorAll('.learn-more').forEach(button => button.addEventListener('click', () => openModal(button.dataset.project)));
+      modal.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeModal));
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+        if (event.key === 'Tab' && modal.classList.contains('open')) {
+          const focusable = [...modal.querySelectorAll('button, [tabindex]:not([tabindex="-1"])')];
+          if (!focusable.length) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
